@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Produk - Kasir Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-32">
+
+    <div class="bg-white p-6 rounded-b-[40px] shadow-sm border-b border-gray-100 mb-6 sticky top-0 z-30">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 id="display-nama-cafe" class="text-2xl font-black text-gray-800 tracking-tighter">Memuat...</h1>
+                <p class="text-[10px] text-green-600 font-bold uppercase tracking-[0.2em]">Manajemen Etalase</p>
+            </div>
+            <button onclick="toggleModal()" class="bg-green-600 text-white w-12 h-12 rounded-2xl shadow-lg shadow-green-100 active:scale-90 transition-all flex items-center justify-center text-xl">
+                ➕
+            </button>
+        </div>
+    </div>
+
+    <div class="px-6">
+        <div id="category-container" class="flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
+            <button onclick="fetchAndRender('Semua')" class="cat-btn bg-green-600 text-white px-6 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-xl shadow-green-100 whitespace-nowrap">Semua</button>
+            <button onclick="fetchAndRender('Makanan')" class="cat-btn bg-white text-gray-500 border border-gray-100 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap">Makanan</button>
+            <button onclick="fetchAndRender('Minuman')" class="cat-btn bg-white text-gray-500 border border-gray-100 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap">Minuman</button>
+            <button onclick="fetchAndRender('Umum')" class="cat-btn bg-white text-gray-500 border border-gray-100 px-6 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap">Umum</button>
+        </div>
+
+        <div id="product-grid" class="grid grid-cols-2 gap-4">
+            </div>
+    </div>
+
+    <div id="productModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md rounded-[40px] p-8 animate-fade-in">
+            <h2 class="text-2xl font-black text-gray-800 mb-6 tracking-tighter">Tambah Menu</h2>
+            <div class="space-y-4">
+                <input type="text" id="p-nama" placeholder="Nama Menu (cth: Kopi Aren)" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 outline-none font-semibold">
+                <input type="number" id="p-harga" placeholder="Harga (Rp)" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 outline-none font-semibold">
+                <select id="p-kategori" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 outline-none font-semibold appearance-none">
+                    <option value="Makanan">Makanan</option>
+                    <option value="Minuman">Minuman</option>
+                    <option value="Umum">Umum</option>
+                </select>
+                <input type="text" id="p-gambar" placeholder="Link Gambar (Opsional)" class="w-full p-4 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-green-500 outline-none font-semibold">
+                
+                <div class="flex gap-3 pt-4">
+                    <button onclick="toggleModal()" class="flex-1 py-4 text-gray-400 font-bold hover:text-gray-600">Batal</button>
+                    <button onclick="saveProduct()" class="flex-1 py-4 bg-green-600 text-white rounded-2xl font-bold shadow-lg shadow-green-100 active:scale-95 transition-all">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-xl h-20 rounded-[30px] shadow-2xl border border-white/20 flex items-center justify-around px-4 z-40">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 text-gray-300">
+            <span class="text-xl">🛒</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Kasir</span>
+        </a>
+        <a href="transaksi.html" class="flex flex-col items-center gap-1 text-green-600">
+            <span class="text-xl">📦</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Produk</span>
+        </a>
+        <button onclick="logout()" class="flex flex-col items-center gap-1 text-red-400">
+            <span class="text-xl">🚪</span>
+            <span class="text-[9px] font-black uppercase tracking-tighter">Keluar</span>
+        </button>
+    </div>
+
+    <div id="notification" class="fixed top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full text-xs font-bold shadow-2xl opacity-0 transition-all pointer-events-none z-[60]"></div>
+
+    <script>
+        const API_URL = '/api'; 
+        const token = localStorage.getItem('token');
+
+        // 1. Inisialisasi & Cek Auth
+        async function init() {
+            if (!token) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const user = await res.json();
+                
+                if (!res.ok) throw new Error();
+                
+                document.getElementById('display-nama-cafe').innerText = user.cafeName || user.nama || "Cafe Pro";
+                fetchAndRender('Semua');
+            } catch (err) {
+                logout();
+            }
+        }
+
+        // 2. Fetch & Render Produk
+        async function fetchAndRender(category = 'Semua') {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-400">Memperbarui data...</div>';
+
+            try {
+                const res = await fetch(`${API_URL}/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                // Sesuai productController yang mengirim success:true, data:[]
+                const result = await res.json();
+                let products = Array.isArray(result) ? result : result.data;
+
+                if (category !== 'Semua') {
+                    products = products.filter(p => p.kategori === category);
+                }
+
+                if (!products || products.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-300">Belum ada menu di kategori ini.</div>';
+                } else {
+                    grid.innerHTML = products.map(p => `
+                        <div class="bg-white p-4 rounded-[32px] shadow-sm border border-gray-100 animate-fade-in relative group">
+                            <button onclick="deleteProduct('${p._id}')" class="absolute -top-2 -right-2 bg-red-500 text-white w-8 h-8 rounded-full shadow-lg flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all z-10">✕</button>
+                            <div class="aspect-square bg-gray-50 rounded-[24px] mb-3 overflow-hidden flex items-center justify-center">
+                                <img src="${p.gambar || 'https://images.unsplash.com/photo-1541167760496-162955ed8a9f?w=400'}" 
+                                     onerror="this.src='https://placehold.co/400?text=Menu'"
+                                     class="w-full h-full object-cover">
+                            </div>
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${p.nama}</h3>
+                            <p class="text-green-600 font-black text-xs mt-1">Rp ${parseInt(p.harga).toLocaleString('id-ID')}</p>
+                        </div>
+                    `).join('');
+                }
+
+                // Update UI State Button Kategori
+                document.querySelectorAll('.cat-btn').forEach(btn => {
+                    if(btn.innerText === category) {
+                        btn.classList.add('bg-green-600', 'text-white', 'shadow-xl', 'shadow-green-100');
+                        btn.classList.remove('bg-white', 'text-gray-500');
+                    } else {
+                        btn.classList.remove('bg-green-600', 'text-white', 'shadow-xl', 'shadow-green-100');
+                        btn.classList.add('bg-white', 'text-gray-500');
+                    }
+                });
+
+            } catch (err) {
+                showNotify("Gagal mengambil data");
+            }
+        }
+
+        // 3. Simpan Produk
+        async function saveProduct() {
+            const nama = document.getElementById('p-nama').value.trim();
+            const harga = document.getElementById('p-harga').value;
+            const kategori = document.getElementById('p-kategori').value;
+            const gambar = document.getElementById('p-gambar').value.trim();
+
+            if (!nama || !harga) return showNotify("Nama & Harga wajib diisi!");
+
+            try {
+                const res = await fetch(`${API_URL}/products`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ nama, harga: Number(harga), kategori, gambar })
+                });
+
+                if (res.ok) {
+                    showNotify("Menu berhasil disimpan!");
+                    toggleModal();
+                    fetchAndRender();
+                    // Reset Form
+                    document.getElementById('p-nama').value = '';
+                    document.getElementById('p-harga').value = '';
+                    document.getElementById('p-gambar').value = '';
+                } else {
+                    const errData = await res.json();
+                    showNotify(errData.msg || "Gagal menyimpan");
+                }
+            } catch (err) {
+                showNotify("Terjadi kesalahan sistem");
+            }
+        }
+
+        // 4. Hapus Produk
+        async function deleteProduct(id) {
+            if (!confirm("Hapus menu ini secara permanen?")) return;
+
+            try {
+                const res = await fetch(`${API_URL}/products/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.ok) {
+                    showNotify("Berhasil dihapus");
+                    fetchAndRender();
+                }
+            } catch (err) {
+                showNotify("Gagal menghapus");
+            }
+        }
+
+        // Helpers
+        function toggleModal() {
+            document.getElementById('productModal').classList.toggle('hidden');
+        }
+
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg;
+            n.style.opacity = "1";
+            n.style.pointerEvents = "auto";
+            setTimeout(() => {
+                n.style.opacity = "0";
+                n.style.pointerEvents = "none";
+            }, 3000);
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

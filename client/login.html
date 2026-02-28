@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - KASIR WA PRO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #F3F8F5 0%, #E2E8F0 100%);
+            min-height: 100vh;
+        }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.5); 
+        }
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(29, 142, 84, 0.1);
+            transform: translateY(-2px);
+        }
+        .animate-shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div id="login-container" class="w-full max-w-[1000px] grid grid-cols-1 lg:grid-cols-2 glass-card rounded-[50px] overflow-hidden shadow-2xl">
+        
+        <div class="p-8 md:p-16 bg-white/40 order-2 lg:order-1 border-r border-white/20">
+            <div class="mb-10 text-center lg:text-left">
+                <div class="flex items-center gap-2 mb-6 lg:hidden justify-center">
+                    <div class="bg-[#1D8E54] p-1.5 rounded-lg text-white">⚡</div>
+                    <span class="font-black text-gray-800 tracking-tighter uppercase">Kasir WA Pro</span>
+                </div>
+                
+                <h2 class="text-3xl font-black text-gray-800 leading-tight">Selamat Datang</h2>
+                <p class="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] mt-2">Masuk untuk kelola toko Anda</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div id="error-msg" class="hidden bg-red-50 text-red-500 p-4 rounded-2xl text-xs font-bold border border-red-100 mb-4"></div>
+                
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">Email Owner</label>
+                    <input type="email" id="email" required placeholder="owner@bisnis.com" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm input-glow outline-none font-bold text-gray-700 transition-all duration-300">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-2 ml-1">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Password</label>
+                        <a href="#" class="text-[10px] font-bold text-[#1D8E54] hover:underline">Lupa?</a>
+                    </div>
+                    <input type="password" id="password" required placeholder="••••••••" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm input-glow outline-none font-bold text-gray-700 transition-all duration-300">
+                </div>
+
+                <button type="submit" id="btn-text" class="w-full bg-[#1D8E54] hover:bg-[#166534] text-white font-black py-5 rounded-2xl shadow-xl shadow-green-100 transition-all transform active:scale-95 flex items-center justify-center gap-3 mt-4">
+                    <span>Masuk Dashboard</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </form>
+
+            <div class="mt-10 text-center text-sm font-bold text-gray-400">
+                Belum punya akun bisnis? <a href="register.html" class="text-[#1D8E54] hover:underline">Daftar Sekarang</a>
+            </div>
+        </div>
+
+        <div class="hidden lg:flex flex-col justify-between p-12 bg-white/20 order-1 lg:order-2 relative">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#1D8E54] p-2.5 rounded-2xl text-white shadow-lg">⚡</div>
+                <span class="text-xl font-black text-[#1E293B] tracking-tighter">KASIR WA <span class="text-[#3B82F6] italic">PRO</span></span>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white/60 p-6 rounded-[32px] border border-white/50 shadow-sm">
+                    <div class="flex gap-1 text-orange-400 mb-2">
+                        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                    </div>
+                    <p class="text-gray-600 font-bold text-sm italic mb-4 leading-relaxed">
+                        "Kelola orderan jadi jauh lebih rapi. Nota otomatis kirim ke WA pelanggan bikin toko saya kelihatan jauh lebih profesional."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=Owner+Kopi&background=1D8E54&color=fff" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+                        <div>
+                            <p class="text-xs font-black text-gray-800">Andika Pratama</p>
+                            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Owner Kopi Sultan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-[10px] font-bold text-gray-400 text-center uppercase tracking-[0.3em]">
+                Version 3.0 Pro &bull; 2026
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api'; // Sesuaikan jika backend di domain berbeda
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('btn-text');
+            const errorEl = document.getElementById('error-msg');
+            const container = document.getElementById('login-container');
+
+            // Feedback Loading
+            btn.innerHTML = `<span>Memproses...</span>`;
+            btn.disabled = true;
+            errorEl.classList.add('hidden');
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Simpan Token & Data User
+                    localStorage.setItem('token', data.token);
+                    // Redirect ke halaman Kasir Utama
+                    window.location.href = 'index.html';
+                } else {
+                    // Tampilkan Error
+                    throw new Error(data.msg || 'Login Gagal');
+                }
+            } catch (err) {
+                btn.innerHTML = `<span>Masuk Dashboard</span>`;
+                btn.disabled = false;
+                errorEl.innerText = err.message;
+                errorEl.classList.remove('hidden');
+                container.classList.add('animate-shake');
+                setTimeout(() => container.classList.remove('animate-shake'), 500);
+            }
+        });
+
+        // Cek jika sudah login, langsung lempar ke index
+        if (localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASIR WA PRO - Kelola Toko Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; overflow-x: hidden; }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="antialiased pb-20">
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl z-[500] transform -translate-x-full transition-transform duration-300">
+        <div class="p-8 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-2">
+                    <div class="bg-green-600 p-2 rounded-xl text-white">⚡</div>
+                    <span class="text-xl font-black uppercase">Menu <span class="text-blue-600 italic">Pro</span></span>
+                </div>
+                <button onclick="toggleSidebar(false)" class="p-2 text-gray-400 hover:text-black">✕</button>
+            </div>
+            <nav class="space-y-2 flex-grow">
+                <a href="index.html" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold bg-green-50 text-green-600">🏠 Halaman Kasir</a>
+                <a href="transaksi.html" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-gray-500 hover:bg-gray-50">📦 Kelola Produk</a>
+                <a href="dashboard.html" class="w-full flex items-center gap-4 p-4 rounded-xl font-bold text-gray-500 hover:bg-gray-50">📊 Laporan Omzet</a>
+            </nav>
+            <button onclick="logout()" class="w-full p-4 text-red-500 font-bold border-t mt-auto text-left">🚪 Keluar</button>
+        </div>
+    </aside>
+    <div id="sidebar-overlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/40 z-[400] hidden backdrop-blur-sm"></div>
+
+    <div class="max-w-[1440px] mx-auto p-4 lg:p-8 space-y-8">
+        <header class="flex flex-col md:flex-row justify-between items-center bg-white/80 glass-card p-5 rounded-[32px] shadow-sm gap-4">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar(true)" class="bg-gray-100 p-3 rounded-2xl hover:bg-gray-200 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <h1 class="text-2xl font-black text-gray-800 uppercase tracking-tighter">KASIR WA <span class="text-blue-500 italic">PRO</span></h1>
+            </div>
+            <div class="flex items-center gap-3 bg-white border border-gray-100 p-2 pr-5 rounded-full shadow-inner">
+                <img id="display-logo" src="https://ui-avatars.com/api/?background=059669&color=fff&name=Store" class="w-9 h-9 rounded-full">
+                <span id="display-nama-cafe" class="text-xs font-black text-gray-600 uppercase">Loading...</span>
+            </div>
+        </header>
+
+        <main id="view-main-kasir" class="view-section active space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-8">
+                    <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        </div>
+                </div>
+
+                <div class="lg:col-span-4 sticky top-8">
+                    <div class="bg-white rounded-[48px] p-8 shadow-2xl border flex flex-col min-h-[500px]">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="font-black text-xl">🛒 Pesanan</h2>
+                            <button onclick="resetCart()" class="text-red-500 text-xs font-bold uppercase">Hapus Semua</button>
+                        </div>
+                        <div id="cartItems" class="flex-grow space-y-4 overflow-y-auto max-h-[350px] no-scrollbar">
+                            <p class="text-gray-400 text-center py-10">Keranjang kosong</p>
+                        </div>
+                        <div class="mt-6 pt-6 border-t-2 border-dashed border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-gray-400 font-bold">Total Tagihan</span>
+                                <span id="total" class="text-3xl font-black text-green-600">Rp 0</span>
+                            </div>
+                            <button onclick="checkout()" class="w-full bg-green-600 text-white font-black py-5 rounded-[24px] uppercase shadow-lg shadow-green-100 hover:bg-green-700 active:scale-95 transition-all">
+                                Checkout & Kirim WA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification" class="fixed top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-full text-xs font-bold shadow-2xl opacity-0 transition-all pointer-events-none z-[600]"></div>
+
+    <script>
+        const API_URL = '/api';
+        const token = localStorage.getItem('token');
+        let products = [];
+        let cart = [];
+
+        // 1. Inisialisasi & Cek Auth
+        async function init() {
+            if (!token) window.location.href = 'login.html'; // Redirect ke login jika tidak ada token
+
+            try {
+                // Ambil Data Profil
+                const resUser = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const userData = await resUser.json();
+                document.getElementById('display-nama-cafe').innerText = userData.cafeName;
+                localStorage.setItem('no_whatsapp', userData.whatsapp || '62');
+
+                // Ambil Data Produk
+                const resProd = await fetch(`${API_URL}/products`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                products = await resProd.json();
+                renderProducts();
+            } catch (err) {
+                console.error(err);
+                logout();
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            if (products.length === 0) {
+                grid.innerHTML = `<div class="col-span-full p-20 text-center bg-white rounded-[40px] border-2 border-dashed">
+                    <p class="text-gray-400 font-bold mb-4">Belum ada produk terdaftar</p>
+                    <a href="transaksi.html" class="text-green-600 font-black underline">Tambah Produk Pertama</a>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div onclick="addToCart('${p._id}')" class="bg-white p-6 rounded-[32px] border border-gray-100 cursor-pointer hover:shadow-xl hover:border-green-200 transition-all group relative overflow-hidden">
+                    <div class="aspect-square bg-gray-50 rounded-[24px] mb-4 flex items-center justify-center overflow-hidden">
+                        ${p.gambar ? `<img src="${p.gambar}" class="w-full h-full object-cover">` : `<span class="text-4xl">☕</span>`}
+                    </div>
+                    <h3 class="font-bold text-gray-800 text-sm truncate">${p.nama}</h3>
+                    <p class="text-green-600 font-black">Rp ${parseInt(p.harga).toLocaleString()}</p>
+                    <div class="absolute bottom-4 right-4 bg-green-600 text-white w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">+</div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const p = products.find(item => item._id === id);
+            const existing = cart.find(item => item._id === id);
+
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...p, qty: 1 });
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const list = document.getElementById('cartItems');
+            const totalEl = document.getElementById('total');
+            
+            if (cart.length === 0) {
+                list.innerHTML = '<p class="text-gray-400 text-center py-10 font-bold">Keranjang kosong</p>';
+                totalEl.innerText = "Rp 0";
+                return;
+            }
+
+            let total = 0;
+            list.innerHTML = cart.map((p, i) => {
+                const subtotal = p.harga * p.qty;
+                total += subtotal;
+                return `
+                <div class="flex justify-between items-center bg-gray-50 p-4 rounded-2xl animate-fade-in">
+                    <div>
+                        <p class="font-black text-gray-800 text-xs">${p.nama}</p>
+                        <p class="text-[10px] text-gray-400">${p.qty}x Rp ${p.harga.toLocaleString()}</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeQty('${p._id}', -1)" class="text-gray-400 hover:text-red-500 font-bold">-</button>
+                        <span class="text-xs font-black">${p.qty}</span>
+                        <button onclick="changeQty('${p._id}', 1)" class="text-gray-400 hover:text-green-500 font-bold">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            totalEl.innerText = "Rp " + total.toLocaleString();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i._id === id);
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i._id !== id);
+            }
+            updateCartUI();
+        }
+
+        async function checkout() {
+            if (cart.length === 0) return showNotify("Pilih produk dulu!");
+
+            const totalAmount = cart.reduce((acc, curr) => acc + (curr.harga * curr.qty), 0);
+            
+            try {
+                // 1. Simpan Transaksi ke DATABASE (Agar muncul di Dashboard)
+                const res = await fetch(`${API_URL}/transactions`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        items: cart, 
+                        totalAmount: totalAmount 
+                    })
+                });
+
+                if (res.ok) {
+                    // 2. Kirim Pesan ke WhatsApp
+                    const wa = localStorage.getItem('no_whatsapp') || '62';
+                    const cafe = document.getElementById('display-nama-cafe').innerText;
+                    let msg = `*STRUK PESANAN - ${cafe}*\n---------------------------\n`;
+                    cart.forEach(p => msg += `• ${p.nama} (${p.qty}x) : Rp ${(p.harga * p.qty).toLocaleString()}\n`);
+                    msg += `---------------------------\n*TOTAL: Rp ${totalAmount.toLocaleString()}*\n\nTerima kasih!`;
+                    
+                    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`);
+                    
+                    resetCart();
+                    showNotify("Transaksi Berhasil Dicatat!");
+                }
+            } catch (err) {
+                showNotify("Gagal menyimpan transaksi");
+            }
+        }
+
+        function resetCart() { cart = []; updateCartUI(); }
+        function toggleSidebar(show) {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full', !show);
+            document.getElementById('sidebar-overlay').classList.toggle('hidden', !show);
+        }
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg;
+            n.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => n.classList.replace('opacity-100', 'opacity-0'), 3000);
+        }
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

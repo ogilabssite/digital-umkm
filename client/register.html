@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar KASIR WA PRO - Kelola Toko Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #F3F8F5 0%, #E2E8F0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.8); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.5); 
+        }
+        input:focus {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        .animate-pop { animation: pop 0.3s ease-out; }
+        @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="w-full max-w-[1100px] grid grid-cols-1 lg:grid-cols-2 glass-card rounded-[50px] overflow-hidden shadow-2xl animate-pop">
+        
+        <div class="hidden lg:flex flex-col justify-center p-12 bg-[#1D8E54] text-white space-y-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            
+            <div class="bg-white/20 w-16 h-16 rounded-3xl flex items-center justify-center mb-4 backdrop-blur-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h1 class="text-5xl font-extrabold leading-tight tracking-tighter">Mulai Bisnis <br><span class="text-green-300">Digital Anda.</span></h1>
+            
+            <p class="text-green-100 text-lg font-medium opacity-80 leading-relaxed">
+                Gabung dengan ribuan pemilik bisnis dan jasa yang sudah beralih ke Kasir WA Pro untuk manajemen order yang lebih elegan.
+            </p>
+            
+            <div class="pt-8 space-y-4">
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <span class="bg-white/20 p-2 rounded-xl text-xs">✔️</span>
+                    <span class="font-bold text-sm tracking-wide">Laporan Omzet Otomatis</span>
+                </div>
+                <div class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10">
+                    <span class="bg-white/20 p-2 rounded-xl text-xs">✔️</span>
+                    <span class="font-bold text-sm tracking-wide">WhatsApp Invoice Automations</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 md:p-16 bg-white/40">
+            <div class="mb-10 text-center lg:text-left">
+                <h2 class="text-3xl font-black text-gray-800 tracking-tighter">Buat Akun Baru</h2>
+                <p class="text-gray-400 font-bold text-xs uppercase tracking-[0.2em] mt-2">Daftarkan Usaha Anda Sekarang</p>
+            </div>
+
+            <div id="error-box" class="hidden mb-6 p-4 bg-red-50 border border-red-100 text-red-500 rounded-2xl text-[11px] font-bold"></div>
+
+            <form id="registerForm" class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">Nama Bisnis / Jasa</label>
+                    <input type="text" id="reg-nama" required placeholder="Contoh: Toko Maju Jaya atau Jasa Desain" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-[#1D8E54] outline-none font-bold text-gray-700 transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">WhatsApp Admin (Tujuan Order)</label>
+                    <input type="text" id="reg-wa" required placeholder="628123456789" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-[#1D8E54] outline-none font-bold text-gray-700 transition-all">
+                    <p class="text-[9px] text-gray-400 mt-2 ml-1 italic">*Gunakan kode negara (62), tanpa tanda + atau spasi.</p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">Email Aktif</label>
+                    <input type="email" id="reg-email" required placeholder="owner@bisnis.com" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-[#1D8E54] outline-none font-bold text-gray-700 transition-all">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">Password</label>
+                    <input type="password" id="reg-pass" required placeholder="••••••••" 
+                        class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:ring-4 focus:ring-green-500/10 focus:border-[#1D8E54] outline-none font-bold text-gray-700 transition-all">
+                </div>
+
+                <button type="submit" id="btn-reg" class="w-full bg-[#1D8E54] hover:bg-[#166534] text-white font-black py-5 rounded-2xl shadow-xl shadow-green-100 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                    <span>Buka Toko Sekarang</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center text-sm font-bold text-gray-400">
+                Sudah punya akun? <a href="login.html" class="text-[#1D8E54] hover:underline">Masuk di sini</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btn-reg');
+            const errorBox = document.getElementById('error-box');
+
+            btn.disabled = true;
+            btn.innerText = "Memproses Pendaftaran...";
+            errorBox.classList.add('hidden');
+
+            const payload = { 
+                businessName: document.getElementById('reg-nama').value,
+                email: document.getElementById('reg-email').value, 
+                password: document.getElementById('reg-pass').value, 
+                whatsapp: document.getElementById('reg-wa').value 
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const contentType = res.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Server Error: Pastikan Database (MONGO_URI) sudah diatur di Vercel Settings.");
+                }
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("Selamat! Akun Anda berhasil didaftarkan.");
+                    window.location.href = 'login.html';
+                } else {
+                    throw new Error(data.message || data.msg || "Gagal mendaftar");
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Buka Toko Sekarang</span>`;
+                errorBox.innerText = err.message;
+                errorBox.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

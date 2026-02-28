@@ -1,0 +1,81 @@
+/* Custom Scrollbar agar lebih cantik */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #1D8E54;
+    border-radius: 10px;
+}
+
+/* Base Style */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* ✅ Fitur Sultan: Loading Spinner */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #1D8E54; /* Warna hijau sesuai tema */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ✅ Fitur Sultan: Toast Notification */
+#notification {
+    visibility: hidden;
+    min-width: 280px;
+    background-color: #1f2937; /* Dark gray */
+    color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    padding: 14px;
+    position: fixed;
+    z-index: 999;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s, visibility 0.5s;
+    font-weight: 500;
+}
+
+#notification.show {
+    visibility: visible;
+    opacity: 1;
+    animation: fadein 0.5s;
+}
+
+/* Animasi Fade */
+@keyframes fadein {
+    from { bottom: 0; opacity: 0; }
+    to { bottom: 30px; opacity: 1; }
+}
+
+/* ✅ Efek Tambahan: Hover Card Produk */
+.product-card {
+    transition: all 0.3s ease;
+}
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+/* Animasi Fade-in untuk Item Keranjang */
+.animate-fade-in {
+    animation: fadeInItem 0.4s ease-out forwards;
+}
+
+@keyframes fadeInItem {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
