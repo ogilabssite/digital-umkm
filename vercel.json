@@ -2,8 +2,8 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth/:path*.js"
+      "source": "/api/:path*",
+      "destination": "/api/:path*.js"
     },
     {
       "source": "/((?!api/).*)",
